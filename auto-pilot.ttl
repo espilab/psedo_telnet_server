@@ -1,0 +1,49 @@
+;
+; auto-pilot.ttl
+;
+;  teraterm macro example for auto login and enter some command.
+
+timeout = 10
+
+:top
+
+send #13
+
+:start
+
+wait  'in:' 'word:' '$ '
+if result=0 goto error_timeout
+if result=1 goto send_id
+if result=2 goto send_pw
+if result=3 goto session
+
+
+
+:send_id
+send 'user001' #13
+goto start
+
+:send_pw
+send 'pass123' #13
+goto start
+
+:session
+pause 1
+send #13
+wait '$ '
+send 'date' #13
+wait '$ '
+statusbox 'OK, check screen'  'status: ok'
+pause 5
+closesbox
+goto end
+
+
+
+:error_timeout
+statusbox 'Something wrong!'  'error'
+pause 5
+closesbox
+goto top
+
+:end
