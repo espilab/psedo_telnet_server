@@ -2,4 +2,4 @@
 Dummy telnet server written in Python.
 
 This program works as dummy telnet server.
-The purpose of this program is to lesson of TeraTerm macro script.
+The purpose of this program is to lesson of TeraTerm macro script on local personal PC environment.
