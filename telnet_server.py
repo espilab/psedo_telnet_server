@@ -22,8 +22,11 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         self.login_step += 1
       elif self.login_step == 1:
         self.input_id = cmd_line
-        self.write('\r\npassword:')
-        self.login_step += 1
+        if len(cmd_line) > 0:
+          self.write('\r\npassword:')
+          self.login_step += 1
+        else:
+          self.login_step = 0
       elif self.login_step == 2:
         self.input_pw = cmd_line
         print('input id=',self.input_id,' pw=',self.input_pw)
@@ -49,8 +52,16 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
           self.write(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S') + "\r\n")
       elif (cmd_line == 'ls'):
           self.write('bin dev etc home  mnt   root  sys usr  var\r\n')
+      elif (cmd_line == 'help'):
+          cr = "\x0d\x0a"
+          self.write('ls   : show list ' + cr)
+          self.write('date : show current date,time ' + cr)
+          self.write('exit : logout ' + cr)
+          self.write('shutdown: shutdown server program ' + cr)
+          self.write('help : show this help' + cr)
       else:
           self.write('? unknown command\r\n')
+
 
     def write(self, str):
         self.request.sendall(bytes(str,'UTF-8'))
@@ -64,40 +75,46 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         while True:
           self.data = self.request.recv(1024)
           a_byte = self.data
-          #print('a_byte=',a_byte)  #DEBUG
-          a_charcode = int.from_bytes(a_byte, 'little')
-          if a_charcode < 256:
+          print('a_byte=',a_byte)  #DEBUG
+          for c in a_byte:
+            #a_charcode = int.from_bytes(a_byte, 'little')
+            a_charcode = c
+            if a_charcode < 256:
               a_char = chr(a_charcode)
 
-          if (a_charcode >= 0x20) and (a_charcode < 0x7f):
-            cmd_line += a_char
-            if self.login_step == 2:
-              self.write('*')
-            else:
-              self.write(a_char)
-          elif (a_charcode == 0x0d):        # CR
-            if self.login_status:
+            if (a_charcode >= 0x20) and (a_charcode < 0x7f):
+              cmd_line += a_char
+              if self.login_step == 2:
+                self.write('*')
+              else:
+                self.write(a_char)
+            elif (a_charcode == 0x0d):        # CR
+              if self.login_status:
                 self.write("\r\n")
                 print('cmd=',cmd_line)
                 self.process_command(cmd_line)
                 cmd_line = ''
                 self.write(prompt)
-            else:
+              else:
                 self.process_login(cmd_line)
-            cmd_line = ''        
-          elif  (a_charcode == 0x08):         # BS
+              cmd_line = ''        
+            elif  (a_charcode == 0x08):         # BS
               if len(cmd_line) > 0:
                 self.write("\x08 \x08")
                 cmd_line = cmd_line[:-1]
               else:
                 self.write("\x07")  # BEL for notice
-          elif (a_charcode == 0x03):         # Ctrl-C
-              sys.exit()
-          else:
-              print('(',a_byte,')')
+            elif (a_charcode == 0x03):         # Ctrl-C
+              #sys.exit()
+              print('0x03')
+            else:
+              print('(',c,')', sep="")
+
 
 if __name__ == '__main__':
     print('telnet server start, waiting...')
+
     HOST, PORT = "localhost", 23
+
     server = socketserver.TCPServer((HOST, PORT), MyTCPHandler)
     server.serve_forever()
