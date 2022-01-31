@@ -1,4 +1,4 @@
-# psedo_telnet_server
+# pseudo_telnet_server
 Dummy telnet server written in Python.
 
 This program works as dummy telnet server.
