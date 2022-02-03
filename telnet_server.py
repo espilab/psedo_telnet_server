@@ -108,7 +108,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
               #sys.exit()
               print('0x03')
             else:
-              print('(',c,')', sep="")
+              print('(',c,')', sep="",end="")
 
 
 if __name__ == '__main__':
