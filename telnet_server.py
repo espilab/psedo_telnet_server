@@ -1,7 +1,6 @@
 #
 #  telnet_server.py --- psedo telnet server (for practice of TeraTerm macro)
 #
-#
 import sys
 import socketserver
 import datetime
@@ -31,7 +30,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         self.input_pw = cmd_line
         print('input id=',self.input_id,' pw=',self.input_pw)
         if (self.input_id == self.correct_id) and (self.input_pw == self.correct_pw):
-          self.write('\r\n Welcome to dummy telnet server!\r\n' + self.prompt)
+          self.write('\r\n===== Welcome to dummy telnet server!\r\n' + self.prompt)
           self.login_status = True
         else:
           self.write('\r\nlogin incorrect\r\n')
@@ -60,8 +59,8 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
           self.write('shutdown: shutdown server program ' + cr)
           self.write('help : show this help' + cr)
       else:
-          self.write('? unknown command\r\n')
-
+          #self.write('? unknown command\r\n')
+          self.write('\r')
 
     def write(self, str):
         self.request.sendall(bytes(str,'UTF-8'))
@@ -75,9 +74,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         while True:
           self.data = self.request.recv(1024)
           a_byte = self.data
-          print('a_byte=',a_byte)  #DEBUG
           for c in a_byte:
-            #a_charcode = int.from_bytes(a_byte, 'little')
             a_charcode = c
             if a_charcode < 256:
               a_char = chr(a_charcode)
@@ -105,16 +102,12 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
               else:
                 self.write("\x07")  # BEL for notice
             elif (a_charcode == 0x03):         # Ctrl-C
-              #sys.exit()
-              print('0x03')
+              print('0x03')  #sys.exit()
             else:
-              print('(',c,')', sep="",end="")
-
+              print('.') #print('(',c,')', sep="")
 
 if __name__ == '__main__':
     print('telnet server start, waiting...')
-
     HOST, PORT = "localhost", 23
-
     server = socketserver.TCPServer((HOST, PORT), MyTCPHandler)
     server.serve_forever()
