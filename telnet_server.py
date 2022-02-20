@@ -104,7 +104,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
             elif (a_charcode == 0x03):         # Ctrl-C
               print('0x03')  #sys.exit()
             else:
-              print('.') #print('(',c,')', sep="")
+              print('.',sep="",end="") #print('(',c,')', sep="")
 
 if __name__ == '__main__':
     print('telnet server start, waiting...')
