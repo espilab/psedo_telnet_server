@@ -91,7 +91,8 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                 print('cmd=',cmd_line)
                 self.process_command(cmd_line)
                 cmd_line = ''
-                self.write(prompt)
+                if self.login_status:
+                  self.write(prompt)
               else:
                 self.process_login(cmd_line)
               cmd_line = ''        
